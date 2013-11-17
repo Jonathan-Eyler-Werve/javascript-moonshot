@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<!-- saved from url=(0025)http://moonlander.seb.ly/ -->
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Lunar Lander</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+
+    <style type="text/css">
+    @font-face {
+        font-family:'BenderLight';
+        src: url('fonts/bender_light-webfont.eot');
+        src: url('fonts/bender_light-webfont.eot?#iefix') format('embedded-opentype'), url('fonts/bender_light-webfont.woff') format('woff'), url('fonts/bender_light-webfont.ttf') format('truetype'), url('fonts/bender_light-webfont.svg#BenderLight') format('svg');
+        font-weight: normal;
+        font-style: normal;
+    }
+    body {
+        background-color: #000000;
+        margin: 0px;
+        overflow: hidden;
+    }
+    .infoBox, .titleBox, .linkBox, .seblyBox {
+        font-family:'BenderLight';
+        font-size:13pt;
+        letter-spacing : 0.2em;
+        line-height:1.7em;
+        color:white;
+        text-transform:uppercase;
+    }
+    .titleBox {
+        font-size:16pt;
+        line-height:1.4em;
+    }
+    .linkBox {
+        font-size:10pt;
+        position:absolute;
+        left : 1em;
+        bottom : 0.5em;
+        display:block;
+        color:#eee;
+    }
+    .linkBox a {
+        color:#fff;
+        text-decoration:none;
+    }
+    .seblyBox {
+        font-size:10pt;
+        position:absolute;
+        right : 1em;
+        bottom : 0.5em;
+        display:block;
+        color:#bbb;
+    }
+    .seblyBox a {
+        color:#fff;
+        text-decoration:none;
+    }
+    /*Touch stuff - TODO: look into non webkit prefixes */
+    * {
+        -webkit-touch-callout: none;
+        /* prevent callout to copy image, etc when tap to hold */
+        -webkit-text-size-adjust: none;
+        /* prevent webkit from resizing text to fit */
+        /* make transparent link selection, adjust last value opacity 0 to 1.0 */
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        -webkit-user-select: none;
+        /* prevent copy paste, to allow, change 'none' to 'text' */
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+    @media only screen and (max-width: 650px) {
+        .infoBox {
+            font-size:6pt;
+        }
+        .seblyBox, .linkBox {
+            font-size:6pt;
+        }
+    }
+    </style>
+    <style type="text/css"></style>
+</head>
+
+<body>
+    <script src="./Lunar Lander_files/geo_data.js"></script>
+    <script type="text/javascript" src="./Lunar Lander_files/geo_func.js"></script>
+    <script>
+    var WEB_SOCKET_URL = "node.seb.ly:8001";
+
+    var IP_ADDRESS = "71.194.184.67";
+    var pos = geo.getPosition();
+    var loc = geo.getLocation();
+    </script>
+
+    <script src="./Lunar Lander_files/Vector2.js"></script>
+    <script src="./Lunar Lander_files/Stats.js"></script>
+    <script src="./Lunar Lander_files/KeyTracker.js"></script>
+    <script src="./Lunar Lander_files/LandscapeData.js"></script>
+    <script src="./Lunar Lander_files/InfoDisplay.js"></script>
+    <script src="./Lunar Lander_files/Lander.js"></script>
+    <!-- requestAnimationFrame shim -->
+    <script src="./Lunar Lander_files/rAF.js">
+    </script>
+    <!-- jsfxr audio sound generator -->
+    <script src="./Lunar Lander_files/audio.js"></script>
+    <script src="./Lunar Lander_files/jsfx.js"></script>
+    <script src="./Lunar Lander_files/jsfxlib.js"></script>
+    <script src="./Lunar Lander_files/Sounds.js"></script>
+    <script src="./Lunar Lander_files/Sockets.js"></script>
+    <script src="./Lunar Lander_files/TouchController.js"></script>
+    <script src="./Lunar Lander_files/game.js"></script>
+    <script type="text/paperscript" src="chrome-extension://pbkgodffljfhdlinelnhklhcdoiedbej/drawController.js" canvas="gyc-canvas"></script>
+    <canvas id="gyc-canvas" style="display:none;" resize=""></canvas>
+    <div id="initial" class="getyourcrayon-menubar ui-draggable" style="display:none;">
+        <div id="gyc-toolbar-header"></div>
+        <div id="gyc-toolbar-buttons"><i id="gyc-paint-button" class="icon-eye-close gyc-button"></i><i id="gyc-draw-button" class="icon-pencil gyc-button"></i><i id="gyc-undo-button" class="icon-undo gyc-button"></i><i id="gyc-clean-slate-button" class="icon-remove-circle gyc-button"></i><i id="gyc-search-tags-button" class="icon-search gyc-button"></i><i id="gyc-save-button" class="icon-cloud-upload gyc-button"></i>
+        </div>
+        <div id="gyc-toolbar" class="ui-accordion ui-widget ui-helper-reset" role="tablist">
+            <div id="gyc-toolbar-toggle" class="ui-accordion-header ui-helper-reset ui-state-default ui-corner-all ui-accordion-icons" role="tab" aria-controls="gyc-toolbar-tools" aria-selected="false" tabindex="0">
+                <span class="ui-accordion-header-icon ui-icon ui-icon-triangle-1-e"></span><i id="gyc-toggle-toolbar-arrow" class="icon-chevron-sign-down"></i>
+            </div>
+            <div id="gyc-toolbar-tools" class="ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom" aria-labelledby="gyc-toolbar-toggle" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;">
+                <div class="gyc-drawing-tools">
+                    <label class="gyc-toolbar-value">Width:
+                        <span id="gyc-current_width">5</span>
+                        <br>
+                        <input id="gyc-width" type="range" name="points" min="1" max="40" value="5">
+                    </label>
+                    <br>
+                    <label class="gyc-toolbar-value">Opacity:
+                        <span id="gyc-current_opacity">100%</span>
+                        <br>
+                        <input id="gyc-opacity" type="range" name="points" min="1" max="100" value="100">
+                    </label>
+                    <form>
+                        <input type="text" id="gyc-color" name="color" value="#123456" style="background-color: rgb(18, 52, 86); color: rgb(255, 255, 255);">
+                    </form>
+                    <div id="gyc-colorpicker">
+                        <div class="farbtastic-gyc">
+                            <div class="color" style="background-color: rgb(0, 127, 255);"></div>
+                            <div class="wheel"></div>
+                            <div class="overlay"></div>
+                            <div class="h-marker marker" style="left: 55px; top: 170px;"></div>
+                            <div class="sl-marker marker" style="left: 82px; top: 127px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="gyc-search-tools" style="display:none;">
+                    <div id="gyc-timeline-container">
+                        <h4 class="search-header"><i class="icon-time"></i> Drawing Timeline</h4><i id="gyc-previous-button" class="icon-chevron-sign-left"></i>
+                        <input type="range" id="gyc-timeline" min="0" max="0"><i id="gyc-next-button" class="icon-chevron-sign-right"></i>
+                    </div>
+                    <h4 class="search-header"><i class="icon-tags"></i> Search Tags</h4>
+                    <form class="gyc-search-tags">
+                        <input type="text" id="gyc-search-field" placeholder="Coming Soon!" disabled="">
+                    </form>
+                    <div id="gyc-tag-holder"></div>
+                </div>
+                <div id="gyc-save-confirm" style="display:none;">
+                    <label>
+                        <h3 class="save-header">Tag your drawing:</h3>
+                        <input type="text" id="gyc-drawingTags" placeholder="Dinosaur, Space_Robot, Steve...">
+                    </label><i class="save-indicator icon-refresh icon-spin icon-large"></i>
+                    <button class="gyc-random-class">Save Drawing</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="gyc-badge" style="display:none;">
+        <a href="http://www.getyourcrayon.com/" style="background-image: url(chrome-extension://pbkgodffljfhdlinelnhklhcdoiedbej/gyc-badgeicon.png); background-position: initial initial; background-repeat: no-repeat no-repeat;"></a>
+    </div>
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+    <link href="./Lunar Lander_files/css" rel="stylesheet" type="text/css">
+</body>
+
+</html>
