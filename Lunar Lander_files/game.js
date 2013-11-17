@@ -118,7 +118,7 @@ function sendPosition() {
 	if(gameState==PLAYING) {
 		var update = {
 			type : 'update', 
-			id : wsID, 
+			id : wsID, //j what is wsID?
 			x : Math.round(lander.pos.x*100), 
 			y : Math.round(lander.pos.y*100), 
 			a : Math.round(lander.rotation), 
@@ -192,27 +192,26 @@ function loop() {
 	if(elapsedFrames<counter) {
 			// c.fillStyle = 'green'; 
 			// 		c.fillRect(0,0,10,10);
-		counter--;
+		counter--; //j controls for counter being ahead of framerate clock? error handler? 
 		return; 
 	}
-	
-	while(elapsedFrames > counter) {
-		lander.update(); 
+
+// j trigger lander.update based on clock vs frame counter
+	while(elapsedFrames > counter) { //j ie normal passage of time 
+		lander.update(); // j send an update. Does this kick me out of the while if lander.update changes counter?
+// sendsPosition runs every 6 frames
 		if((counter%6)==0){
 			sendPosition(); 
-
 		}
 		
-		
+		// j what's my scope here? Hmm, still in the while(time > updates)
 		counter++; 
 	
-		skippedFrames ++; 
+		skippedFrames ++; // j why does this run? 
 		if (skippedFrames>30) {
 			//set to paused
 			counter = elapsedFrames; 
 		} 
-		
-		
 
 	}
 
@@ -241,7 +240,7 @@ function loop() {
 //				console.log(map(touchController.leftTouch.getX(), SCREEN_WIDTH*touchRotateLeft, SCREEN_WIDTH*touchRotateRight, -90,90,true));
 				var touchAngle = map(touchController.leftTouch.getXOffset(), SCREEN_WIDTH*touchRotateRange*-0.5, SCREEN_WIDTH*touchRotateRange*0.5, -90,90);
 				touchAngle +=touchRotateStartAngle; 
-				
+				//j How does map work in js? 
 				
 				lander.setRotation(touchAngle);  
 				
@@ -270,9 +269,9 @@ function loop() {
 		checkCollisions(); 
 	
 	updateView(); 
-	render(); 
+	render(); //j wats this?
 	if((!mouseHidden) && (Date.now() - lastMouseMove >1000)){
-		 document.body.style.cursor = "none"; 
+		 document.body.style.cursor = "none"; //j Hides cursor if last mouse move was more than 1s ago
 		lastMouseHide = Date.now();
 		mouseHidden = true; 
 	}
@@ -314,7 +313,7 @@ function render() {
 	// 		c.fillRect(testPoints[i].x, testPoints[i].y, 1,1); 		
 	// 	}
 	
-	if(counter%4==0) updateTextInfo(); 
+	if(counter%4==0) updateTextInfo(); //j update text every 4 frames
 	
 	c.restore();
 	// c.strokeStyle = 'white';
@@ -703,7 +702,7 @@ function updateTextInfo() {
 	// +(lander.vel.y<0)?' ˆ':' >'
 
 	if((lander.fuel < 300) && (gameState == PLAYING)) {
-		if((counter%50)<30) { 
+		if((counter%50)<30) { //times the beep to cut in and out
 			var playBeep; 
 			if(lander.fuel <= 0) {
 				playBeep = infoDisplay.showGameInfo("Out of fuel"); 
@@ -712,7 +711,7 @@ function updateTextInfo() {
 			} 
 			if(playBeep) samples.beep.play(); 
 		} else {
-			infoDisplay.hideGameInfo(); 
+			infoDisplay.hideGameInfo(); //blink the gameInfo with same rate as beep
 		}
 		
 		
@@ -804,7 +803,7 @@ function resizeGame (event) {
 	if((SCREEN_WIDTH== newWidth) && (SCREEN_HEIGHT==newHeight)) return; 
 	if(touchable) window.scrollTo(0,-10); 
 	
-	SCREEN_WIDTH = canvas.width = newWidth; 
+	SCREEN_WIDTH = canvas.width = newWidth; // reassigning constants o.O
 	SCREEN_HEIGHT = canvas.height = newHeight; 
 	
 	setZoom(zoomedIn) ;
