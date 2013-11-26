@@ -7,3 +7,12 @@ What is the loop function in Moonlander?
 
 what is wsID?
 
+
+
+PROCESS FOR BUILDING GAME.
+
+1) Understand flight mechanic. 
+2) Modify landscape file successfully. 
+3) Consider alternate flight mechanics. 
+4) Write story. 
+5) Incorporate JS flight controls. 
